@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS Dashboard - Redesign</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 登录模态框动画 */
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+        }
+
+        .animate-modal-appear {
+            animation: modal-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* 输入框聚焦效果增强 */
+        .form-input:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* 按钮悬停效果 */
+        .btn-gradient:hover {
+            background-size: 200% 200%;
+            animation: gradient-shift 2s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <div class="h-16 flex items-center px-6 border-b border-slate-100 mb-4">
+                <div class="flex items-center gap-2 text-indigo-600 cursor-pointer" onclick="window.location.href='dashboard-redesign.html'">
+                    <i class="fa-solid fa-robot text-2xl"></i>
+                    <span class="text-xl font-bold tracking-tight">AgentOS</span>
+                </div>
+            </div>
+            
+            <nav class="px-4 space-y-1">
+                <a href="dashboard-redesign.html" class="flex items-center gap-3 px-3 py-2.5 bg-indigo-50 text-indigo-600 rounded-lg font-medium">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Home
+                </a>
+                <a href="chats.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-regular fa-comments w-5 text-center"></i> Chats
+                </a>
+                <a href="creates.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plus w-5 text-center"></i> Creates
+                </a>
+                <a href="plugins.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plug w-5 text-center"></i> Plugins
+                </a>
+                <a href="memory.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-brain w-5 text-center"></i> Memory
+                </a>
+            </nav>
+        </div>
+        
+        <div class="p-4 border-t border-slate-100">
+            <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+            <h1 class="text-lg font-semibold text-slate-800">AgentOS Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <button id="authBtn" class="px-3 py-1.5 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors">Login</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-semibold border border-indigo-200 cursor-pointer">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Workspace Area -->
+        <div class="flex-1 overflow-hidden flex flex-col lg:flex-row p-6 gap-6 bg-slate-50/50">
+            
+            <!-- Central Chat/Execution Panel -->
+            <div class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-w-[500px]">
+                
+                <!-- Agent Status Header -->
+<div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-slate-100 flex items-center justify-center rounded-full border border-slate-200 text-slate-500" id="agentIcon">
+            <i class="fa-solid fa-robot text-xl"></i>
+        </div>
+        <div>
+            <div class="flex items-center gap-2">
+                <h2 class="font-semibold text-slate-800 tracking-tight" id="agentName">General Agent</h2>
+                <span id="agentStatusBadge" class="px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-1.5 shadow-sm">
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Idle
+                </span>
+            </div>
+            <p id="agentStatusText" class="text-xs text-slate-500 mt-0.5">Waiting for task...</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="window.location.href='chats.html'" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-lg transition-colors" title="View History">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+    </div>
+</div>
+<!-- Chat/Logs scrollable area -->
+                <div id="chatContainer" class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide scroll-smooth">
+    <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center opacity-75">
+        <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-300 border border-indigo-100 mb-4">
+            <i class="fa-solid fa-robot text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-slate-800 mb-2">Welcome to AgentOS</h2>
+        <p class="text-sm text-slate-500 max-w-sm">Type a prompt below to initiate a task. The agent will process your request and stream its thought process here.</p>
+    </div>
+</div>
+<!-- Input box -->
+                <div class="p-4 bg-white border-t border-slate-200 shrink-0">
+                    <div class="relative flex items-end bg-slate-50 border border-slate-300 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 rounded-xl transition-all shadow-sm group">
+                        <textarea id="chatInput" placeholder="Type your message to interrupt or guide the agent..." class="w-full bg-transparent p-3 max-h-32 min-h-[44px] resize-none outline-none text-[15px] text-slate-700 scrollbar-hide" rows="1" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 128) + 'px'"></textarea>
+                        <div class="p-2 flex gap-1 shrink-0">
+                            <button class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </button>
+                            <button id="sendBtn" class="w-10 h-10 flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition-colors group-focus-within:bg-indigo-700">
+                                <i class="fa-regular fa-paper-plane text-sm ml-0.5 mt-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Context & Tools -->
+            <div class="w-[320px] flex flex-col gap-4 shrink-0 hidden lg:flex">
+                
+                <!-- Agent Info Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                    <h3 class="text-sm font-semibold text-slate-800 border-b border-slate-100 pb-2 mb-3">Agent Details</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Highly capable research agent configured to analyze current trends and draft comprehensive summary reports based on web data.
+                    </p>
+                    
+                    <h3 class="text-sm font-semibold text-slate-800 border-b border-slate-100 mt-5 pb-2 mb-3">Current Goals</h3>
+                    <ul id="currentGoalsList" class="text-sm text-slate-600 space-y-2"><li class="text-slate-400 italic">No active goals.</li></ul>
+                </div>
+
+                <!-- Tools Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                        <h3 class="text-sm font-semibold text-slate-800">Active Tools</h3>
+                        <span id="activeToolsCount" class="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">3 Enabled</span>
+                    </div>
+                    <div id="activeToolsList" class="space-y-2">
+                        <section class="tool-item rounded-lg border border-slate-200 bg-slate-50/50 transition-colors" data-tool="web-browser" data-enabled="true">
+                            <button type="button" class="tool-toggle w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
+                                <span class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <i class="fa-solid fa-globe text-blue-500"></i> Web Browser
+                                </span>
+                                <i class="tool-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform"></i>
+                            </button>
+                            <div class="tool-panel hidden border-t border-slate-200 px-3 py-2">
+                                <p class="text-xs text-slate-500">Search and read web pages in real time.</p>
+                            </div>
+                        </section>
+                        <section class="tool-item rounded-lg border border-slate-200 bg-slate-50/50 transition-colors" data-tool="file-reader" data-enabled="true">
+                            <button type="button" class="tool-toggle w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
+                                <span class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <i class="fa-regular fa-file-lines text-orange-500"></i> File Reader
+                                </span>
+                                <i class="tool-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform"></i>
+                            </button>
+                            <div class="tool-panel hidden border-t border-slate-200 px-3 py-2">
+                                <p class="text-xs text-slate-500">Read documents and extract structured text snippets.</p>
+                            </div>
+                        </section>
+                        <section class="tool-item rounded-lg border border-slate-200 bg-slate-50/50 transition-colors" data-tool="report-gen" data-enabled="true">
+                            <button type="button" class="tool-toggle w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
+                                <span class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <i class="fa-solid fa-pen-nib text-indigo-500"></i> Report Gen
+                                </span>
+                                <i class="tool-chevron fa-solid fa-chevron-down text-slate-400 text-xs transition-transform"></i>
+                            </button>
+                            <div class="tool-panel hidden border-t border-slate-200 px-3 py-2">
+                                <p class="text-xs text-slate-500">Generate concise reports from agent runtime outputs.</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Memory Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex-1 flex flex-col min-h-0">
+                    <h3 class="text-sm font-semibold text-slate-800 border-b border-slate-100 pb-2 mb-3 shrink-0">Memory Context</h3>
+                    <div id="memoryContextList" class="space-y-3 overflow-y-auto scrollbar-hide text-sm"><div class="text-slate-400 italic text-center py-4">No recent context</div></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/80 to-pink-900/70 backdrop-blur-sm hidden flex items-center justify-center z-50 animate-fade-in">
+        <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 overflow-hidden transform transition-all duration-300 scale-100 animate-modal-appear">
+            <!-- Header with gradient -->
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-6 text-white relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/20 via-purple-600/20 to-pink-600/20 animate-pulse"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                <i class="fa-solid fa-lock text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold tracking-tight">欢迎登录</h2>
+                                <p class="text-indigo-100 text-sm">AgentOS 智能助手平台</p>
+                            </div>
+                        </div>
+                        <button id="closeModalBtn" class="text-white/80 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all duration-200">
+                            <i class="fa-solid fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Decorative elements -->
+                <div class="absolute -top-10 -right-10 w-20 h-20 bg-white/10 rounded-full"></div>
+                <div class="absolute -bottom-8 -left-8 w-16 h-16 bg-white/5 rounded-full"></div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="p-8">
+                <form id="loginForm" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-user text-indigo-500"></i>
+                            用户名
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="usernameInput" class="w-full px-4 py-3 pl-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-slate-50/50 hover:bg-white hover:border-slate-300" placeholder="请输入用户名" required>
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-key text-indigo-500"></i>
+                            密码
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="passwordInput" class="w-full px-4 py-3 pl-12 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-slate-50/50 hover:bg-white hover:border-slate-300" placeholder="请输入密码" required>
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="loginError" class="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg p-3 hidden flex items-center gap-2">
+                        <i class="fa-solid fa-exclamation-triangle"></i>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <button type="submit" id="loginSubmitBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sign-in-alt"></i>
+                        <span>登录</span>
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-100">
+                        <div class="text-xs text-slate-500 mb-1">演示账号</div>
+                        <div class="font-mono text-sm text-slate-700 font-semibold">
+                            admin / 123456
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <p class="text-xs text-slate-400">
+                        安全登录 • 受保护的会话
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation Script (Iteration & Upgrades) -->
+<script>
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const authBtn = document.getElementById('authBtn');
+    const loginModal = document.getElementById('loginModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    const loginError = document.getElementById('loginError');
+    const errorText = document.getElementById('errorText');
+    const togglePassword = document.getElementById('togglePassword');
+    const chatContainer = document.getElementById('chatContainer');
+    const agentStatusBadge = document.getElementById('agentStatusBadge');
+    const agentStatusText = document.getElementById('agentStatusText');
+    const agentIcon = document.getElementById('agentIcon');
+    const activeToolsCount = document.getElementById('activeToolsCount');
+    const toolItems = Array.from(document.querySelectorAll('.tool-item'));
+
+    const API_BASE_URL = (() => {
+        const origin = String(window.location.origin || '');
+        if (/^https?:\/\/(127\.0\.0\.1|localhost):3000$/i.test(origin)) {
+            return origin;
+        }
+        return 'http://127.0.0.1:3000';
+    })();
+
+    function buildApiUrl(path) {
+        return API_BASE_URL + path;
+    }
+
+    async function parseApiResponse(response) {
+        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+        if (contentType.includes('application/json')) {
+            try {
+                return await response.json();
+            } catch (_) {
+                return { ok: false, message: '服务端返回了无效的 JSON 响应' };
+            }
+        }
+
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (_) {
+            return { ok: false, message: text || ('HTTP ' + response.status) };
+        }
+    }
+
+    function setToolExpanded(item, expanded) {
+        const panel = item.querySelector('.tool-panel');
+        const chevron = item.querySelector('.tool-chevron');
+        if (panel) {
+            panel.classList.toggle('hidden', !expanded);
+        }
+        if (chevron) {
+            chevron.classList.toggle('rotate-180', expanded);
+        }
+        item.classList.toggle('border-indigo-200', expanded);
+        item.classList.toggle('bg-indigo-50/40', expanded);
+    }
+
+    function updateActiveToolsCount() {
+        if (!activeToolsCount) {
+            return;
+        }
+        const enabledCount = toolItems.filter((item) => item.dataset.enabled !== 'false').length;
+        activeToolsCount.textContent = enabledCount + ' Enabled';
+    }
+
+    function initActiveTools() {
+        if (!toolItems.length) {
+            return;
+        }
+
+        toolItems.forEach((item) => {
+            const toggle = item.querySelector('.tool-toggle');
+            if (!toggle) {
+                return;
+            }
+
+            toggle.addEventListener('click', () => {
+                const panel = item.querySelector('.tool-panel');
+                const shouldExpand = panel ? panel.classList.contains('hidden') : false;
+
+                toolItems.forEach((other) => {
+                    setToolExpanded(other, false);
+                });
+
+                setToolExpanded(item, shouldExpand);
+            });
+        });
+
+        updateActiveToolsCount();
+    }
+
+    function setStatus(status) {
+        if (status === 'running') {
+            agentStatusBadge.className = 'px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1.5 shadow-sm';
+            agentStatusBadge.innerHTML = '<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Running';
+            agentStatusText.textContent = 'Agent is processing your task...';
+            agentIcon.className = 'w-10 h-10 bg-indigo-50 flex items-center justify-center rounded-full border border-indigo-100 text-indigo-600';
+        } else {
+            agentStatusBadge.className = 'px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-1.5 shadow-sm';
+            agentStatusBadge.innerHTML = '<span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Idle';
+            agentStatusText.textContent = 'Waiting for task...';
+            agentIcon.className = 'w-10 h-10 bg-slate-100 flex items-center justify-center rounded-full border border-slate-200 text-slate-500';
+        }
+    }
+
+    function appendUserMessage(text) {
+        const welcome = document.getElementById('welcomeScreen');
+        if (welcome) welcome.remove();
+
+        const el = document.createElement('div');
+        el.className = 'flex gap-4 fade-in mb-6';
+        el.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0 border border-slate-200 shadow-sm">
+                <i class="fa-regular fa-user text-sm"></i>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-medium text-slate-800 mb-1">User</div>
+                <div class="text-slate-700 leading-relaxed text-[15px] bg-slate-50 px-4 py-2.5 rounded-2xl rounded-tl-sm border border-slate-200 inline-block shadow-sm whitespace-pre-wrap">
+                    ${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                </div>
+            </div>
+        `;
+        chatContainer.appendChild(el);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function appendAgentThinking() {
+        const el = document.createElement('div');
+        el.id = 'agentThinkingNode';
+        el.className = 'flex gap-4 fade-in mb-6';
+        el.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-100">
+                <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-medium text-slate-800 mb-2 flex items-center gap-2">
+                    Agent Thought Process
+                    <span class="text-xs text-indigo-500 animate-pulse">Running...</span>
+                </div>
+                <div class="bg-[#1e1e2e] rounded-lg p-4 font-mono text-[13px] leading-[1.6] text-[#a6accd] overflow-x-auto shadow-inner min-h-[100px] scroll-smooth" id="liveExecutionLog">
+                    <div class="text-blue-400">Initializing task execution...</div>
+                    <div id="cursorPulse" class="animate-pulse text-slate-400 inline-block font-bold">_</div>
+                </div>
+            </div>
+        `;
+        chatContainer.appendChild(el);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return document.getElementById('liveExecutionLog');
+    }
+
+    function appendFinalResult(resultNode, data) {
+        const cursor = document.getElementById('cursorPulse');
+        if (cursor) cursor.remove();
+        
+        const steps = data.result?.step_results || [];
+        let html = steps.map(s => `<div class="text-green-400">�?${s.task}</div>`).join('');
+        if (!html) html = `<div class="text-green-400">�?Success</div>`;
+        
+        const summary = data.summary ? JSON.stringify(data.summary) : "";
+        if (summary) {
+            html += `<div class="text-yellow-400 mt-2">Result: ${summary}</div>`;
+        }
+
+        const logNode = document.createElement('div');
+        logNode.innerHTML = html;
+        resultNode.appendChild(logNode);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        const icon = resultNode.parentElement.parentElement.querySelector('.fa-spinner');
+        if (icon) {
+            icon.className = 'fa-solid fa-check text-sm';
+            icon.parentElement.className = 'w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100';
+            const title = icon.parentElement.nextElementSibling.querySelector('span');
+            if (title) {
+                title.className = 'text-xs text-emerald-500';
+                title.textContent = 'Completed';
+            }
+        }
+        resultNode.parentElement.parentElement.id = ''; // Remove id
+    }
+
+    async function runAgentTask(prompt) {
+        const token = localStorage.getItem('preview_demo_token');
+        if (!token) {
+            alert('Please login first by navigating to the login view if needed. (Mocking without token is disabled)');
+            return;
+        }
+
+        setStatus('running');
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        const logWindow = appendAgentThinking();
+
+        try {
+            const response = await fetch(buildApiUrl('/api/agent/run'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await parseApiResponse(response);
+
+            if (!response.ok || !data.ok) {
+                throw new Error((data && data.message) || ('Run failed (HTTP ' + response.status + ')'));
+            }
+
+            appendFinalResult(logWindow, data);
+            
+            // Update goals randomly
+            document.getElementById('currentGoalsList').innerHTML = '<li class="flex gap-2"><i class="fa-regular fa-circle-check text-emerald-500 mt-0.5"></i><span>Completed task: ' + prompt.substring(0, 20) + '...</span></li>';
+        } catch (error) {
+            const cursor = document.getElementById('cursorPulse');
+            if (cursor) cursor.remove();
+            const errNode = document.createElement('div');
+            errNode.className = 'text-red-400 mt-2';
+            errNode.textContent = 'Error: ' + error.message;
+            logWindow.appendChild(errNode);
+        } finally {
+            setStatus('idle');
+            sendBtn.disabled = false;
+            chatInput.disabled = false;
+            setTimeout(() => chatInput.focus(), 100);
+        }
+    }
+
+    sendBtn.addEventListener('click', () => {
+        const val = chatInput.value.trim();
+        if(!val) return;
+        
+        appendUserMessage(val);
+        chatInput.value = '';
+        chatInput.style.height = '44px';
+        
+        runAgentTask(val);
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 登录模态框相关函数
+    function showLoginModal() {
+        loginModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        // 延迟聚焦以确保动画完成
+        setTimeout(() => usernameInput.focus(), 300);
+    }
+
+    function hideLoginModal() {
+        loginModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        loginError.classList.add('hidden');
+        loginForm.reset();
+        // 重置密码可见性
+        passwordInput.type = 'password';
+        togglePassword.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    }
+
+    function showLoginError(message) {
+        errorText.textContent = message;
+        loginError.classList.remove('hidden');
+        // 添加抖动动画效果
+        loginError.classList.add('animate-shake');
+        setTimeout(() => loginError.classList.remove('animate-shake'), 500);
+    }
+
+    async function handleLogin(username, password) {
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtn.textContent = '登录中...';
+        loginError.classList.add('hidden');
+
+        try {
+            const response = await fetch(buildApiUrl('/api/login'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await parseApiResponse(response);
+
+            if (response.ok && data.ok && data.token) {
+                localStorage.setItem('preview_demo_token', data.token);
+                updateAuthButton();
+                hideLoginModal();
+            } else {
+                showLoginError((data && data.message) || ('登录失败 (HTTP ' + response.status + ')'));
+            }
+        } catch (error) {
+            showLoginError('网络错误，请重试（请确认 127.0.0.1:3000 服务已启动）');
+        } finally {
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = '登录';
+        }
+    }
+
+    // 模态框事件监听器
+    closeModalBtn.addEventListener('click', hideLoginModal);
+
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) {
+            hideLoginModal();
+        }
+    });
+
+    // 密码可见性切换
+    togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePassword.innerHTML = isPassword ?
+            '<i class="fa-solid fa-eye-slash"></i>' :
+            '<i class="fa-solid fa-eye"></i>';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        if (!username || !password) {
+            showLoginError('请输入用户名和密码');
+            return;
+        }
+
+        handleLogin(username, password);
+    });
+
+    // ESC键关闭模态框
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !loginModal.classList.contains('hidden')) {
+            hideLoginModal();
+        }
+    });
+
+    function updateAuthButton() {
+        const token = localStorage.getItem('preview_demo_token');
+        if (token) {
+            authBtn.textContent = 'Logout';
+            authBtn.className = 'px-3 py-1.5 text-sm font-medium rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors';
+        } else {
+            authBtn.textContent = 'Login';
+            authBtn.className = 'px-3 py-1.5 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors';
+        }
+    }
+
+    authBtn.addEventListener('click', () => {
+        const token = localStorage.getItem('preview_demo_token');
+        if (token) {
+            localStorage.removeItem('preview_demo_token');
+            updateAuthButton();
+            return;
+        }
+        // 显示登录模态框
+        showLoginModal();
+    });
+
+    updateAuthButton();
+    initActiveTools();
+</script>
+
+</body>
+</html>
+

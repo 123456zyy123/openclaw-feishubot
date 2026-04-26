@@ -1,0 +1,13 @@
+{
+  "name": "workspace-runner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Root npm proxy scripts for IntelliCodeAssistant workspace",
+  "scripts": {
+    "start": "npm --prefix ./IntelliCodeAssistant run start",
+    "web": "npm --prefix ./IntelliCodeAssistant run web",
+    "web:open": "npm --prefix ./IntelliCodeAssistant run web:open",
+    "web:restart": "npm --prefix ./IntelliCodeAssistant run web:restart",
+    "test": "npm --prefix ./IntelliCodeAssistant run test"
+  }
+}

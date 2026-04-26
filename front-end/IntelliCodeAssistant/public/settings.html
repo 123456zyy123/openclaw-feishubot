@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS - Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <div class="h-16 flex items-center px-6 border-b border-slate-100 mb-4">
+                <div class="flex items-center gap-2 text-indigo-600 cursor-pointer" onclick="window.location.href='dashboard-redesign.html'">
+                    <i class="fa-solid fa-robot text-2xl"></i>
+                    <span class="text-xl font-bold tracking-tight">AgentOS</span>
+                </div>
+            </div>
+
+            <nav class="px-4 space-y-1">
+                <a href="dashboard-redesign.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Home
+                </a>
+                <a href="chats.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-regular fa-comments w-5 text-center"></i> Chats
+                </a>
+                <a href="creates.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plus w-5 text-center"></i> Creates
+                </a>
+                <a href="plugins.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plug w-5 text-center"></i> Plugins
+                </a>
+                <a href="memory.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-brain w-5 text-center"></i> Memory
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-100">
+            <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 bg-indigo-50 text-indigo-600 rounded-lg font-medium border border-indigo-100/50">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex min-w-0 bg-slate-50 overflow-hidden">
+        <div class="w-64 border-r border-slate-200 bg-white shrink-0 hidden lg:block overflow-y-auto">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-slate-800 mb-6">Settings</h2>
+                <nav class="space-y-1" id="settingsNav">
+                    <button data-target="profile" class="settings-nav-item w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 text-indigo-600 rounded-lg font-medium" type="button">
+                        <span>General Profiles</span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button data-target="env" class="settings-nav-item w-full flex items-center justify-between px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors" type="button">
+                        <span>Environment Config</span>
+                        <i class="fa-solid fa-chevron-right text-xs hidden"></i>
+                    </button>
+                    <button data-target="api" class="settings-nav-item w-full flex items-center justify-between px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors" type="button">
+                        <span>API Keys</span>
+                        <i class="fa-solid fa-chevron-right text-xs hidden"></i>
+                    </button>
+                    <button data-target="logs" class="settings-nav-item w-full flex items-center justify-between px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors" type="button">
+                        <span>System Logs</span>
+                        <i class="fa-solid fa-chevron-right text-xs hidden"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto scrollbar-hide p-8">
+            <div class="max-w-3xl w-full">
+                <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h1 class="text-lg font-semibold text-slate-800">Workspace Settings</h1>
+                    <button id="authBtn" class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"></button>
+                </div>
+
+                <section id="section-profile" class="settings-section">
+                    <h2 class="text-base font-semibold text-slate-800 mb-4">General Profiles</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+                        <h3 class="text-sm font-semibold text-slate-800 mb-4">Workspace Identity</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Display Name</label>
+                                <input id="displayName" type="text" class="w-full max-w-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Workspace Description</label>
+                                <textarea id="workspaceDesc" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-env" class="settings-section hidden">
+                    <h2 class="text-base font-semibold text-slate-800 mb-4">Environment Config</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Debug Mode</label>
+                                <select id="debugMode" class="w-full max-w-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    <option value="false">False</option>
+                                    <option value="true">True</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Max Parallel Tasks</label>
+                                <input id="maxTasks" type="number" min="1" max="20" class="w-full max-w-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-api" class="settings-section hidden">
+                    <h2 class="text-base font-semibold text-slate-800 mb-4">API Keys</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">OpenAI API Key</label>
+                            <input id="openaiKey" type="password" placeholder="sk-..." class="w-full max-w-md px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Anthropic API Key</label>
+                            <input id="anthropicKey" type="password" placeholder="sk-ant-..." class="w-full max-w-md px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-logs" class="settings-section hidden">
+                    <h2 class="text-base font-semibold text-slate-800 mb-4">System Logs</h2>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+                        <div id="systemLogs" class="bg-slate-900 text-green-400 p-4 rounded-lg font-mono text-xs overflow-auto h-52">
+                            [INFO] Settings page loaded.<br>
+                        </div>
+                        <button id="clearLogsBtn" type="button" class="mt-4 px-3 py-2 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Clear Logs</button>
+                    </div>
+                </section>
+
+                <div id="actionBar" class="flex justify-end gap-3 mt-8 border-t border-slate-200 pt-6">
+                    <button id="cancelBtn" type="button" class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Reset</button>
+                    <button id="saveSettingsBtn" type="button" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+                        <i class="fa-solid fa-save"></i>
+                        <span>Save Changes</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+(() => {
+    const SETTINGS_KEY = "preview_settings_v1";
+    const defaults = {
+        displayName: "John Doe",
+        workspaceDesc: "Agent workspace for daily tasks",
+        debugMode: "false",
+        maxTasks: "5",
+        openaiKey: "",
+        anthropicKey: "",
+    };
+
+    const els = {
+        navItems: document.querySelectorAll(".settings-nav-item"),
+        sections: document.querySelectorAll(".settings-section"),
+        displayName: document.getElementById("displayName"),
+        workspaceDesc: document.getElementById("workspaceDesc"),
+        debugMode: document.getElementById("debugMode"),
+        maxTasks: document.getElementById("maxTasks"),
+        openaiKey: document.getElementById("openaiKey"),
+        anthropicKey: document.getElementById("anthropicKey"),
+        saveBtn: document.getElementById("saveSettingsBtn"),
+        cancelBtn: document.getElementById("cancelBtn"),
+        clearLogsBtn: document.getElementById("clearLogsBtn"),
+        logs: document.getElementById("systemLogs"),
+        actionBar: document.getElementById("actionBar"),
+        authBtn: document.getElementById("authBtn"),
+    };
+
+    function pushLog(line) {
+        const ts = new Date().toLocaleTimeString();
+        els.logs.innerHTML += `[${ts}] ${line}<br>`;
+        els.logs.scrollTop = els.logs.scrollHeight;
+    }
+
+    function showSection(target) {
+        els.navItems.forEach((item) => {
+            const isActive = item.dataset.target === target;
+            item.classList.toggle("bg-slate-50", isActive);
+            item.classList.toggle("text-indigo-600", isActive);
+            item.classList.toggle("text-slate-600", !isActive);
+            const arrow = item.querySelector("i");
+            if (arrow) {
+                arrow.classList.toggle("hidden", !isActive);
+            }
+        });
+
+        els.sections.forEach((section) => {
+            section.classList.toggle("hidden", section.id !== `section-${target}`);
+        });
+
+        els.actionBar.classList.toggle("hidden", target === "logs");
+    }
+
+    function loadSettings() {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        const settings = raw ? { ...defaults, ...JSON.parse(raw) } : defaults;
+        els.displayName.value = settings.displayName;
+        els.workspaceDesc.value = settings.workspaceDesc;
+        els.debugMode.value = settings.debugMode;
+        els.maxTasks.value = settings.maxTasks;
+        els.openaiKey.value = settings.openaiKey;
+        els.anthropicKey.value = settings.anthropicKey;
+        pushLog("Settings loaded from local storage.");
+    }
+
+    function collectSettings() {
+        return {
+            displayName: els.displayName.value.trim(),
+            workspaceDesc: els.workspaceDesc.value.trim(),
+            debugMode: els.debugMode.value,
+            maxTasks: els.maxTasks.value,
+            openaiKey: els.openaiKey.value.trim(),
+            anthropicKey: els.anthropicKey.value.trim(),
+        };
+    }
+
+    function updateAuthButton() {
+        const token = localStorage.getItem("preview_demo_token");
+        if (token) {
+            els.authBtn.textContent = "Logout";
+            els.authBtn.className = "px-3 py-1.5 text-sm font-medium rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors";
+        } else {
+            els.authBtn.textContent = "Login";
+            els.authBtn.className = "px-3 py-1.5 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors";
+        }
+    }
+
+    els.navItems.forEach((item) => {
+        item.addEventListener("click", () => showSection(item.dataset.target));
+    });
+
+    els.saveBtn.addEventListener("click", () => {
+        const icon = els.saveBtn.querySelector("i");
+        const text = els.saveBtn.querySelector("span");
+        icon.className = "fa-solid fa-spinner fa-spin";
+        text.textContent = "Saving...";
+        els.saveBtn.disabled = true;
+
+        setTimeout(() => {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(collectSettings()));
+            icon.className = "fa-solid fa-check";
+            text.textContent = "Saved";
+            pushLog("Settings saved.");
+
+            setTimeout(() => {
+                icon.className = "fa-solid fa-save";
+                text.textContent = "Save Changes";
+                els.saveBtn.disabled = false;
+            }, 1000);
+        }, 500);
+    });
+
+    els.cancelBtn.addEventListener("click", () => {
+        loadSettings();
+        pushLog("Settings reset to last saved values.");
+    });
+
+    els.clearLogsBtn.addEventListener("click", () => {
+        els.logs.innerHTML = "[INFO] Logs cleared.<br>";
+    });
+
+    els.authBtn.addEventListener("click", () => {
+        const token = localStorage.getItem("preview_demo_token");
+        if (token) {
+            localStorage.removeItem("preview_demo_token");
+            updateAuthButton();
+            pushLog("User logged out.");
+        } else {
+            window.location.href = "/";
+        }
+    });
+
+    loadSettings();
+    showSection("profile");
+    updateAuthButton();
+})();
+</script>
+</body>
+</html>

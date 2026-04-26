@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS - Memory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <div class="h-16 flex items-center px-6 border-b border-slate-100 mb-4">
+                <div class="flex items-center gap-2 text-indigo-600 cursor-pointer" onclick="window.location.href='dashboard-redesign.html'">
+                    <i class="fa-solid fa-robot text-2xl"></i>
+                    <span class="text-xl font-bold tracking-tight">AgentOS</span>
+                </div>
+            </div>
+
+            <nav class="px-4 space-y-1">
+                <a href="dashboard-redesign.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Home
+                </a>
+                <a href="chats.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-regular fa-comments w-5 text-center"></i> Chats
+                </a>
+                <a href="creates.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plus w-5 text-center"></i> Creates
+                </a>
+                <a href="plugins.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                    <i class="fa-solid fa-plug w-5 text-center"></i> Plugins
+                </a>
+                <a href="memory.html" class="flex items-center gap-3 px-3 py-2.5 bg-indigo-50 text-indigo-600 rounded-lg font-medium border border-indigo-100/50">
+                    <i class="fa-solid fa-brain w-5 text-center"></i> Memory
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-100">
+            <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 bg-slate-50 overflow-hidden">
+        <header class="h-16 border-b border-slate-200 flex items-center justify-between px-6 bg-white shrink-0 z-10 gap-4">
+            <div>
+                <h1 class="text-lg font-semibold text-slate-800">Knowledge & Memory</h1>
+                <p id="resultMeta" class="text-xs text-slate-500">Waiting for memory data...</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="dbBadge" class="text-xs px-2 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-100">DB Offline</span>
+                <button id="authBtn" class="px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors">Login</button>
+                <button id="refreshBtn" class="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center transition-colors" title="Refresh memory">
+                    <i class="fa-solid fa-rotate-right text-xs"></i>
+                </button>
+                <button id="connectBtn" class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-database"></i>
+                    <span id="connectBtnText">Connect DB</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-hidden flex flex-col md:flex-row p-4 md:p-6 gap-4 md:gap-6">
+            <section class="w-full md:w-[320px] flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden shrink-0">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <h2 class="text-sm font-semibold text-slate-800">Collections</h2>
+                    <button id="addNoteBtn" class="text-xs text-indigo-600 font-medium hover:text-indigo-700 flex items-center gap-1">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Add Note
+                    </button>
+                </div>
+
+                <div id="collectionList" class="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-hide">
+                    <div class="text-center text-slate-400 text-sm py-8">No collection</div>
+                </div>
+            </section>
+
+            <section class="flex-1 flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden min-w-0">
+                <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 bg-white">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input id="searchInput" type="text" placeholder="Search by requirement, function name, source, or code text..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors">
+                    </div>
+                    <button id="resetHiddenBtn" class="px-4 py-2 text-sm bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors shrink-0">
+                        Reset Hidden
+                    </button>
+                </div>
+
+                <div id="recordsContainer" class="flex-1 overflow-auto bg-slate-50/50 p-5 space-y-3 scrollbar-hide">
+                    <div class="text-center text-slate-400 text-sm py-8"><i class="fa-solid fa-spinner fa-spin"></i> Loading memory records...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        (() => {
+            const STORAGE_KEYS = {
+                notes: "preview_memory_notes_v2",
+                hidden: "preview_memory_hidden_v2"
+            };
+
+            const state = {
+                token: localStorage.getItem("preview_demo_token") || "",
+                apiRecords: [],
+                localNotes: loadArray(STORAGE_KEYS.notes),
+                hiddenKeys: new Set(loadArray(STORAGE_KEYS.hidden)),
+                activeCollection: "all",
+                dbConnected: false,
+                lastFiltered: []
+            };
+
+            const els = {
+                resultMeta: document.getElementById("resultMeta"),
+                dbBadge: document.getElementById("dbBadge"),
+                authBtn: document.getElementById("authBtn"),
+                refreshBtn: document.getElementById("refreshBtn"),
+                connectBtn: document.getElementById("connectBtn"),
+                connectBtnText: document.getElementById("connectBtnText"),
+                addNoteBtn: document.getElementById("addNoteBtn"),
+                collectionList: document.getElementById("collectionList"),
+                searchInput: document.getElementById("searchInput"),
+                resetHiddenBtn: document.getElementById("resetHiddenBtn"),
+                recordsContainer: document.getElementById("recordsContainer")
+            };
+
+            function loadArray(key) {
+                try {
+                    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (_) {
+                    return [];
+                }
+            }
+
+            function saveNotes() {
+                localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(state.localNotes));
+            }
+
+            function saveHidden() {
+                localStorage.setItem(STORAGE_KEYS.hidden, JSON.stringify(Array.from(state.hiddenKeys)));
+            }
+
+            function updateAuthButton() {
+                if (state.token) {
+                    els.authBtn.textContent = "Logout";
+                    els.authBtn.className = "px-3 py-1.5 text-sm font-medium rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors";
+                } else {
+                    els.authBtn.textContent = "Login";
+                    els.authBtn.className = "px-3 py-1.5 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors";
+                }
+            }
+
+            function updateDbStatus() {
+                if (state.dbConnected) {
+                    els.dbBadge.textContent = "DB Connected";
+                    els.dbBadge.className = "text-xs px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100";
+                    els.connectBtnText.textContent = "Disconnect";
+                    els.connectBtn.className = "px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-2";
+                    return;
+                }
+
+                els.dbBadge.textContent = "DB Offline";
+                els.dbBadge.className = "text-xs px-2 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-100";
+                els.connectBtnText.textContent = "Connect DB";
+                els.connectBtn.className = "px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm transition-colors flex items-center gap-2";
+            }
+
+            function escapeHtml(value) {
+                return String(value || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+
+            function truncate(text, limit) {
+                const source = String(text || "").trim();
+                if (source.length <= limit) {
+                    return source;
+                }
+                return source.slice(0, limit) + " ...";
+            }
+
+            function formatDate(value) {
+                if (!value) {
+                    return "Unknown time";
+                }
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) {
+                    return "Unknown time";
+                }
+                return date.toLocaleString();
+            }
+
+            function makeApiRecord(item, index) {
+                const collection = String(item.type || item.scope || "misc").toLowerCase();
+                const title = String(item.requirement || item.root_requirement || item.functionName || item.type || "Memory record");
+                const rawText = (() => {
+                    if (typeof item.code === "string" && item.code.trim()) {
+                        return item.code;
+                    }
+                    if (typeof item.generated_code === "string" && item.generated_code.trim()) {
+                        return item.generated_code;
+                    }
+                    if (typeof item.optimized_code === "string" && item.optimized_code.trim()) {
+                        return item.optimized_code;
+                    }
+                    try {
+                        return JSON.stringify(item, null, 2);
+                    } catch (_) {
+                        return String(item || "");
+                    }
+                })();
+
+                const key = [
+                    "api",
+                    String(item.id || ""),
+                    String(item.timestamp || ""),
+                    collection,
+                    String(item.functionName || ""),
+                    String(index)
+                ].join("|");
+
+                return {
+                    key,
+                    kind: "api",
+                    collection,
+                    title,
+                    rawText,
+                    timestamp: item.timestamp || "",
+                    sourceLabel: "Server Memory"
+                };
+            }
+
+            function getLocalRecords() {
+                return state.localNotes.map((note) => ({
+                    key: "note|" + note.id,
+                    kind: "note",
+                    collection: String(note.collection || "notes").toLowerCase(),
+                    title: String(note.title || "Untitled note"),
+                    rawText: String(note.content || ""),
+                    timestamp: note.timestamp || "",
+                    sourceLabel: "Local Note"
+                }));
+            }
+
+            function getAllRecords() {
+                return [...getLocalRecords(), ...state.apiRecords];
+            }
+
+            function getFilteredRecords() {
+                const allRecords = getAllRecords();
+                const query = els.searchInput.value.trim().toLowerCase();
+
+                const filtered = allRecords.filter((record) => {
+                    if (state.hiddenKeys.has(record.key)) {
+                        return false;
+                    }
+
+                    if (state.activeCollection !== "all" && record.collection !== state.activeCollection) {
+                        return false;
+                    }
+
+                    if (!query) {
+                        return true;
+                    }
+
+                    const haystack = [
+                        record.title,
+                        record.collection,
+                        record.sourceLabel,
+                        record.rawText,
+                        record.timestamp
+                    ].join(" ").toLowerCase();
+                    return haystack.includes(query);
+                });
+
+                state.lastFiltered = filtered;
+                return filtered;
+            }
+
+            function renderCollections() {
+                const allRecords = getAllRecords().filter((record) => !state.hiddenKeys.has(record.key));
+                const counts = new Map();
+                counts.set("all", allRecords.length);
+                allRecords.forEach((record) => {
+                    const value = counts.get(record.collection) || 0;
+                    counts.set(record.collection, value + 1);
+                });
+
+                const entries = Array.from(counts.entries());
+                if (entries.length === 0) {
+                    els.collectionList.innerHTML = '<div class="text-center text-slate-400 text-sm py-8">No collection</div>';
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+                entries.forEach(([name, count]) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.dataset.collection = name;
+                    const active = state.activeCollection === name;
+                    button.className = "w-full flex items-center justify-between rounded-lg px-3 py-2.5 border text-left transition-colors " +
+                        (active
+                            ? "border-indigo-200 bg-indigo-50 text-indigo-700"
+                            : "border-slate-200 bg-white text-slate-700 hover:border-slate-300");
+                    button.innerHTML = [
+                        '<span class="text-sm font-medium">' + escapeHtml(name === "all" ? "All Records" : name.toUpperCase()) + '</span>',
+                        '<span class="text-xs px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-500">' + count + '</span>'
+                    ].join("");
+                    button.addEventListener("click", () => {
+                        state.activeCollection = name;
+                        renderAll();
+                    });
+                    fragment.appendChild(button);
+                });
+
+                els.collectionList.innerHTML = "";
+                els.collectionList.appendChild(fragment);
+            }
+
+            function renderRecords() {
+                if (!state.token) {
+                    els.resultMeta.textContent = "Login required to access server memory";
+                    els.recordsContainer.innerHTML = [
+                        '<div class="max-w-md mx-auto text-center py-10">',
+                        '  <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-400 flex items-center justify-center">',
+                        '    <i class="fa-solid fa-lock"></i>',
+                        '  </div>',
+                        '  <h3 class="text-base font-semibold text-slate-800 mb-2">Login required</h3>',
+                        '  <p class="text-sm text-slate-500 mb-5">Memory data is protected by token auth. Login and refresh to continue.</p>',
+                        '  <button id="memoryLoginBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">Go To Login</button>',
+                        '</div>'
+                    ].join("");
+                    const loginBtn = document.getElementById("memoryLoginBtn");
+                    if (loginBtn) {
+                        loginBtn.addEventListener("click", () => {
+                            window.location.href = "/";
+                        });
+                    }
+                    return;
+                }
+
+                const records = getFilteredRecords();
+                const hiddenCount = state.hiddenKeys.size;
+                els.resultMeta.textContent = records.length + " records shown" + (hiddenCount > 0 ? " • " + hiddenCount + " hidden" : "");
+
+                if (records.length === 0) {
+                    els.recordsContainer.innerHTML = '<div class="text-center text-slate-500 text-sm py-10">No records match current filters.</div>';
+                    return;
+                }
+
+                const cards = records.map((record) => {
+                    const preview = escapeHtml(truncate(record.rawText, 340));
+                    const removeLabel = record.kind === "note" ? "Delete" : "Hide";
+                    return [
+                        '<article class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">',
+                        '  <div class="flex items-start justify-between gap-3 mb-2">',
+                        '    <div>',
+                        '      <h3 class="text-sm font-semibold text-slate-800">' + escapeHtml(record.title) + '</h3>',
+                        '      <div class="text-[11px] text-slate-500 mt-1 flex flex-wrap gap-2">',
+                        '        <span class="px-1.5 py-0.5 rounded border border-slate-200 bg-slate-50">' + escapeHtml(record.collection.toUpperCase()) + '</span>',
+                        '        <span class="px-1.5 py-0.5 rounded border border-indigo-100 bg-indigo-50 text-indigo-600">' + escapeHtml(record.sourceLabel) + '</span>',
+                        '        <span>' + escapeHtml(formatDate(record.timestamp)) + '</span>',
+                        '      </div>',
+                        '    </div>',
+                        '    <div class="flex items-center gap-1">',
+                        '      <button data-action="copy" data-key="' + escapeHtml(record.key) + '" class="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-colors" title="Copy">',
+                        '        <i class="fa-regular fa-copy text-xs"></i>',
+                        '      </button>',
+                        '      <button data-action="remove" data-key="' + escapeHtml(record.key) + '" class="w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 transition-colors" title="' + removeLabel + '">',
+                        '        <i class="fa-regular fa-trash-can text-xs"></i>',
+                        '      </button>',
+                        '    </div>',
+                        '  </div>',
+                        '  <pre class="text-xs text-slate-600 bg-slate-50 p-3 rounded border border-slate-100 whitespace-pre-wrap break-words">' + preview + '</pre>',
+                        '</article>'
+                    ].join("");
+                });
+
+                els.recordsContainer.innerHTML = cards.join("");
+            }
+
+            function renderAll() {
+                renderCollections();
+                renderRecords();
+            }
+
+            async function fetchMemory() {
+                state.token = localStorage.getItem("preview_demo_token") || "";
+                updateAuthButton();
+
+                if (!state.token) {
+                    state.apiRecords = [];
+                    renderAll();
+                    return;
+                }
+
+                els.recordsContainer.innerHTML = '<div class="text-center text-slate-400 text-sm py-8"><i class="fa-solid fa-spinner fa-spin"></i> Loading memory records...</div>';
+
+                try {
+                    const response = await fetch("/api/memory", {
+                        headers: {
+                            "Authorization": "Bearer " + state.token
+                        }
+                    });
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.ok) {
+                        throw new Error(payload.message || "Failed to fetch memory");
+                    }
+
+                    const memory = Array.isArray(payload.memory) ? payload.memory : [];
+                    state.apiRecords = memory.map((item, index) => makeApiRecord(item, index));
+                    renderAll();
+                } catch (error) {
+                    if (String(error.message || "").toLowerCase().includes("unauthorized")) {
+                        localStorage.removeItem("preview_demo_token");
+                        state.token = "";
+                        updateAuthButton();
+                        state.apiRecords = [];
+                        renderAll();
+                        return;
+                    }
+
+                    els.resultMeta.textContent = "Unable to fetch memory from server";
+                    els.recordsContainer.innerHTML = '<div class="text-center text-red-500 text-sm py-8">' + escapeHtml(error.message || "Unknown error") + '</div>';
+                }
+            }
+
+            els.authBtn.addEventListener("click", () => {
+                if (state.token) {
+                    localStorage.removeItem("preview_demo_token");
+                    state.token = "";
+                    updateAuthButton();
+                    fetchMemory();
+                    return;
+                }
+                window.location.href = "/";
+            });
+
+            els.refreshBtn.addEventListener("click", () => {
+                fetchMemory();
+            });
+
+            els.connectBtn.addEventListener("click", () => {
+                state.dbConnected = !state.dbConnected;
+                updateDbStatus();
+            });
+
+            els.searchInput.addEventListener("input", () => {
+                renderAll();
+            });
+
+            els.addNoteBtn.addEventListener("click", () => {
+                const title = window.prompt("Note title");
+                if (!title) {
+                    return;
+                }
+
+                const content = window.prompt("Note content (optional)") || "";
+                const collection = window.prompt("Collection name (default: notes)", "notes") || "notes";
+
+                state.localNotes.unshift({
+                    id: Date.now() + "-" + Math.floor(Math.random() * 1000),
+                    title: title.trim(),
+                    content: content.trim(),
+                    collection: collection.trim().toLowerCase() || "notes",
+                    timestamp: new Date().toISOString()
+                });
+
+                saveNotes();
+                renderAll();
+            });
+
+            els.resetHiddenBtn.addEventListener("click", () => {
+                state.hiddenKeys.clear();
+                saveHidden();
+                renderAll();
+            });
+
+            els.recordsContainer.addEventListener("click", async (event) => {
+                const button = event.target.closest("button[data-action]");
+                if (!button) {
+                    return;
+                }
+
+                const action = button.dataset.action;
+                const key = button.dataset.key;
+                const record = state.lastFiltered.find((item) => item.key === key);
+                if (!record) {
+                    return;
+                }
+
+                if (action === "copy") {
+                    try {
+                        await navigator.clipboard.writeText(record.rawText || "");
+                        button.classList.add("border-emerald-200", "text-emerald-600");
+                        setTimeout(() => {
+                            button.classList.remove("border-emerald-200", "text-emerald-600");
+                        }, 600);
+                    } catch (_) {
+                        window.alert("Unable to copy text in this browser.");
+                    }
+                    return;
+                }
+
+                if (action === "remove") {
+                    if (record.kind === "note") {
+                        state.localNotes = state.localNotes.filter((note) => ("note|" + note.id) !== record.key);
+                        saveNotes();
+                    } else {
+                        state.hiddenKeys.add(record.key);
+                        saveHidden();
+                    }
+                    renderAll();
+                }
+            });
+
+            updateAuthButton();
+            updateDbStatus();
+            fetchMemory();
+        })();
+    </script>
+</body>
+</html>
+
