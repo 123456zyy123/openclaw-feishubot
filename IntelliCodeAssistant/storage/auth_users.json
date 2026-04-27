@@ -1,0 +1,10 @@
+[
+  {
+    "username": "admin",
+    "role": "admin",
+    "disabled": false,
+    "password_hash": "pbkdf2$120000$65426b699e4e39a246cb2c634b2c6f71$20de12a4b2c020ec6307f1686d96d92b40295fc1d06a08df41897d3ed18694f9",
+    "created_at": "2026-04-14T12:33:11.417Z",
+    "last_login_at": "2026-04-27T07:11:15.241Z"
+  }
+]
