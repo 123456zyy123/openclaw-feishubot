@@ -1,0 +1,263 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "/home/node/.openclaw/workspace",
+      "models": {
+        "minimax/MiniMax-M2.7": {
+          "alias": "Minimax"
+        }
+      },
+      "model": {
+        "primary": "minimax/MiniMax-M2.7"
+      },
+      "sandbox": {
+        "mode": "off"
+      },
+      "compaction": {
+        "mode": "safeguard"
+      }
+    },
+    "list": [
+      {
+        "id": "main"
+      },
+      {
+        "id": "gaosongdeng",
+        "name": "gaosongdeng",
+        "workspace": "/home/node/.openclaw/workspace/gaosongdeng",
+        "agentDir": "/home/node/.openclaw/agents/gaosongdeng/agent"
+      },
+      {
+        "id": "qianzaoaiyin",
+        "name": "qianzaoaiyin",
+        "workspace": "/home/node/.openclaw/workspace/qianzaoaiyin",
+        "agentDir": "/home/node/.openclaw/agents/qianzaoaiyin/agent"
+      },
+      {
+        "id": "yaolenai",
+        "name": "yaolenai",
+        "workspace": "/home/node/.openclaw/workspace/yaolenai",
+        "agentDir": "/home/node/.openclaw/agents/yaolenai/agent"
+      },
+      {
+        "id": "changqishuangshi",
+        "name": "changqishuangshi",
+        "workspace": "/home/node/.openclaw/workspace/changqishuangshi",
+        "agentDir": "/home/node/.openclaw/agents/changqishuangshi/agent"
+      },
+      {
+        "id": "zhuiminglixi",
+        "name": "zhuiminglixi",
+        "workspace": "/home/node/.openclaw/workspace/zhuiminglixi",
+        "agentDir": "/home/node/.openclaw/agents/zhuiminglixi/agent"
+      }
+    ]
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "83a284f3c1095c413997274937beaa4e5f3fb2152c1b633553ef9188ae404217"
+    },
+    "port": 18789,
+    "bind": "lan",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "allowedOrigins": [
+        "*"
+      ],
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send",
+        "sms.search"
+      ]
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "tools": {
+    "profile": "coding"
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "minimax": {
+        "baseUrl": "https://api.minimaxi.com/anthropic",
+        "models": [
+          {
+            "id": "MiniMax-M2.7",
+            "name": "MiniMax M2.7",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.06,
+              "cacheWrite": 0.375
+            },
+            "contextWindow": 204800,
+            "maxTokens": 131072
+          }
+        ],
+        "api": "anthropic-messages",
+        "authHeader": true
+      }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "minimax:cn": {
+        "provider": "minimax",
+        "mode": "api_key"
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-04-21T08:46:21.951Z",
+    "lastRunVersion": "2026.4.15",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.4.15",
+    "lastTouchedAt": "2026-04-22T08:20:58.993Z"
+  },
+  "plugins": {
+    "entries": {
+      "minimax": {
+        "enabled": true
+      },
+      "feishu": {
+        "enabled": true
+      },
+      "feishu-bot-chat": {
+        "enabled": true
+      }
+    },
+    "installs": {
+      "feishu": {
+        "source": "npm",
+        "spec": "@openclaw/feishu",
+        "installPath": "/home/node/.openclaw/extensions/feishu",
+        "version": "2026.3.13",
+        "resolvedName": "@openclaw/feishu",
+        "resolvedVersion": "2026.3.13",
+        "resolvedSpec": "@openclaw/feishu@2026.3.13",
+        "integrity": "sha512-D5vPkgGZ9lfCQnDFlGrQN6NCSUYRgYW9k7amW3qlm9zBI4Sp+alRZVqLZ4yZ2eCXHjw9RVp/L75wjJ7NBQyfEw==",
+        "shasum": "39128ff918f8d3387331818cbe3f8b24a82e4c0d",
+        "resolvedAt": "2026-04-15T10:52:13.433Z",
+        "installedAt": "2026-04-15T10:52:23.936Z"
+      },
+      "feishu-bot-chat": {
+        "source": "clawhub",
+        "spec": "clawhub:feishu-bot-chat@0.2.0",
+        "installPath": "/home/node/.openclaw/extensions/feishu-bot-chat",
+        "version": "0.2.0",
+        "integrity": "sha256-0XkMOJV3hELSwEeGfZjVerY4bEYO0fG+lGE2hBdE6LE=",
+        "resolvedAt": "2026-04-22T08:20:05.454Z",
+        "clawhubUrl": "https://clawhub.ai",
+        "clawhubPackage": "feishu-bot-chat",
+        "clawhubFamily": "code-plugin",
+        "clawhubChannel": "community",
+        "installedAt": "2026-04-22T08:20:05.455Z"
+      }
+    }
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "requireMention": true,
+      "streaming": false,  
+      "accounts": {
+        "gaosongdeng": {
+          "name": "gaosongdeng",
+          "groupPolicy": "open",
+          "appId": "cli_a955c9c9c6611bb3",
+          "appSecret": "Kz6ZIHnCqRkNybU2yLNL8gXTmiGVKYEa",
+          "requireMention": false
+        },
+        "yaolenai": {
+          "name": "ceshi",
+          "groupPolicy": "open",
+          "appId": "cli_a9552fdcd0fadbb5",
+          "appSecret": "bDiLmrRNv9lp6DTOx7Zj2fLlzuQ72VcT",
+          "requireMention": false
+        },
+        "qianzaoaiyin": {
+          "name": "guihuazhe",
+          "groupPolicy": "open",
+          "appId": "cli_a9551b493539dcca",
+          "appSecret": "o3zmuXBYdt0Yjd5bz52SshUJqja4kkab",
+          "requireMention": false
+        },
+        "zhuiminglixi": {
+          "name": "shujusoujizhe",
+          "groupPolicy": "open",
+          "appId": "cli_a955167e66b85bce",
+          "appSecret": "vErEbpPN2oKoFW0mHbeNAh2eNqe8g7p4",
+          "requireMention": false
+        },
+        "changqishuangshi": {
+          "name": "kaifazhe",
+          "groupPolicy": "open",
+          "appId": "cli_a9551391bcb8dcb2",
+          "appSecret": "WREySnEqYvppIOiCHolf75LiwhDEHsiY",
+          "requireMention": false
+        }
+      }
+    }
+  },
+  "bindings": [
+    {
+      "agentId": "gaosongdeng",
+      "match": {
+        "channel": "feishu",
+        "accountId": "gaosongdeng"
+      }
+    },
+    {
+      "agentId": "ceshi",
+      "match": {
+        "channel": "feishu",
+        "accountId": "yaolenai"
+      }
+    },
+    {
+      "agentId": "guihuazhe",
+      "match": {
+        "channel": "feishu",
+        "accountId": "qianzaoaiyin"
+      }
+    },
+    {
+      "agentId": "shujusoujizhe",
+      "match": {
+        "channel": "feishu",
+        "accountId": "zhuiminglixi"
+      }
+    },
+    {
+      "agentId": "kaifazhe",
+      "match": {
+        "channel": "feishu",
+        "accountId": "changqishuangshi"
+      }
+    }
+  ]
+}

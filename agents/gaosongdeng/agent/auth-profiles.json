@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "profiles": {
+    "minimax:cn": {
+      "type": "api_key",
+      "provider": "minimax",
+      "key": "sk-cp-qoM2nbue9uUBInBpVVAKV_4Po2th8EPVw_3ZxL8Mg14w1Zgt-QFj_iYFeKzO4zpkvyF5YZjDNU0C6lWqiWQrvr0sSmyGpbjh3poNeGxll073XwYgTZ1rFJs"
+    }
+  }
+}
